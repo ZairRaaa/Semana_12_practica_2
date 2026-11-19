@@ -1,0 +1,43 @@
+{% extends "prestamos/base.html" %}
+
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block contenido %}
+<h1>{{ titulo }}</h1>
+<div class="tabla">
+    <table aria-label="{{ titulo }}">
+        <thead>
+            <tr>
+                <th scope="col">Equipo</th>
+                {% if gestionar %}<th scope="col">Docente</th>{% endif %}
+                <th scope="col">Cantidad</th>
+                <th scope="col">Préstamo</th>
+                <th scope="col">Devolución prevista</th>
+                <th scope="col">Estado</th>
+                {% if gestionar %}<th scope="col">Acción</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for prestamo in prestamos %}
+                <tr>
+                    <th scope="row">{{ prestamo.equipo }}</th>
+                    {% if gestionar %}<td>{{ prestamo.docente }}</td>{% endif %}
+                    <td>{{ prestamo.cantidad }}</td>
+                    <td>{{ prestamo.fecha_prestamo|date:"d/m/Y" }}</td>
+                    <td>{{ prestamo.fecha_devolucion|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="estado {{ prestamo.estado|lower }}">{{ prestamo.estado }}</span>
+                        {% if prestamo.devuelto_en %}
+                            <small>{{ prestamo.devuelto_en|date:"d/m/Y" }}</small>
+                        {% endif %}
+                    </td>
+                    {% if gestionar %}
+                        <td><a href="{% url 'prestamos:devolver' prestamo.pk %}">Registrar devolución</a></td>
+                    {% endif %}
+                </tr>
+            {% empty %}
+                <tr><td colspan="{% if gestionar %}7{% else %}5{% endif %}">Todavía no hay préstamos en este listado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

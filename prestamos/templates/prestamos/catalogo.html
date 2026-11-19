@@ -1,0 +1,49 @@
+{% extends "prestamos/base.html" %}
+
+{% block titulo %}Catálogo de equipos{% endblock %}
+{% block contenido %}
+<h1>Catálogo de equipos</h1>
+<form class="buscador" method="get">
+    <div>
+        <label for="busqueda">Buscar por código, nombre o categoría</label>
+        <input type="search" id="busqueda" name="q" value="{{ busqueda }}">
+    </div>
+    <button type="submit">Buscar</button>
+    {% if busqueda %}<a href="{% url 'prestamos:catalogo' %}">Limpiar búsqueda</a>{% endif %}
+</form>
+<div class="tabla">
+    <table aria-label="Equipos de laboratorio">
+        <thead>
+            <tr>
+                <th scope="col">Equipo</th>
+                <th scope="col">Categoría</th>
+                <th scope="col">Laboratorio</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Disponibles</th>
+                {% if perms.prestamos.solicitar_prestamo %}<th scope="col">Solicitud</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for equipo in equipos %}
+                <tr>
+                    <th scope="row">{{ equipo.nombre }}<small>{{ equipo.codigo_patrimonial }}</small></th>
+                    <td>{{ equipo.categoria }}</td>
+                    <td>{{ equipo.laboratorio }}</td>
+                    <td><span class="estado {{ equipo.estado }}">{{ equipo.get_estado_display }}</span></td>
+                    <td>{% if equipo.estado == "operativo" %}{{ equipo.disponibles }}{% else %}0{% endif %}</td>
+                    {% if perms.prestamos.solicitar_prestamo %}
+                        <td>
+                            {% if equipo.estado == "operativo" and equipo.disponibles > 0 %}
+                                <a href="{% url 'prestamos:solicitar' %}?equipo={{ equipo.pk|urlencode }}"
+                                   aria-label="Solicitar {{ equipo.nombre }}">Solicitar</a>
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% empty %}
+                <tr><td colspan="{% if perms.prestamos.solicitar_prestamo %}6{% else %}5{% endif %}">No se encontraron equipos.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

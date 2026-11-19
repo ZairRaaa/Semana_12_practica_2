@@ -1,0 +1,32 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}Préstamos de laboratorio{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'prestamos/estilos.css' %}">
+</head>
+<body>
+    <header class="encabezado">
+        <nav class="contenedor navegacion" aria-label="Navegación principal">
+            <a class="marca" href="{% url 'prestamos:catalogo' %}">Préstamos de laboratorio</a>
+            {% if perms.prestamos.ver_historial_propio %}
+                <a href="{% url 'prestamos:historial' %}">Mis préstamos</a>
+            {% endif %}
+            {% if perms.prestamos.registrar_prestamo %}
+                <a href="{% url 'prestamos:registrar' %}">Registrar préstamo</a>
+            {% endif %}
+            {% if perms.prestamos.registrar_devolucion %}
+                <a href="{% url 'prestamos:activos' %}">Devoluciones</a>
+            {% endif %}
+        </nav>
+    </header>
+    <main class="contenedor contenido">
+        {% for message in messages %}
+            <p class="aviso" role="status">{{ message }}</p>
+        {% endfor %}
+        {% block contenido %}{% endblock %}
+    </main>
+</body>
+</html>

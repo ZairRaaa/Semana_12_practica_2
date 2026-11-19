@@ -1,0 +1,21 @@
+{% extends "prestamos/base.html" %}
+
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block contenido %}
+<h1>{{ titulo }}</h1>
+{% if prestamo %}
+    <p>{{ prestamo.equipo }} · {{ prestamo.docente }} · Unidades: {{ prestamo.cantidad }}</p>
+{% endif %}
+<form class="panel" method="post">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <div class="acciones">
+        <button type="submit">Guardar</button>
+        {% if prestamo %}
+            <a href="{% url 'prestamos:activos' %}">Cancelar</a>
+        {% else %}
+            <a href="{% url 'prestamos:catalogo' %}">Cancelar</a>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}
