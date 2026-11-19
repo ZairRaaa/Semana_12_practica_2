@@ -20,6 +20,11 @@
             {% if perms.prestamos.registrar_devolucion %}
                 <a href="{% url 'prestamos:activos' %}">Devoluciones</a>
             {% endif %}
+            {% if user.is_authenticated %}
+                <a href="{% url 'panel' %}">Mi cuenta</a>
+            {% else %}
+                <a href="{% url 'ingreso' %}">Iniciar sesión</a>
+            {% endif %}
         </nav>
     </header>
     <main class="contenedor contenido">

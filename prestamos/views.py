@@ -1,11 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
+from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods, require_safe
 
-from .eventos import registrar_evento
+from cuentas.auditoria import auditar_operacion
+
 from .forms import DevolucionForm, RegistroPrestamoForm, SolicitudPrestamoForm
 from .grupos import ASISTENTES
 from .models import Equipo, Prestamo
@@ -28,12 +30,13 @@ def catalogo(request):
 def _registrar(request, formulario, destino, titulo):
     if request.method == "POST" and formulario.is_valid():
         try:
-            prestamo = formulario.registrar()
+            with transaction.atomic():
+                prestamo = formulario.registrar()
+                auditar_operacion(request, "prestamo_creado", "prestamo", prestamo.pk)
         except ValidationError as error:
             for campo, errores in error.error_dict.items():
                 formulario.add_error(None if campo == NON_FIELD_ERRORS else campo, errores)
         else:
-            registrar_evento(request, "prestamo", prestamo_id=prestamo.pk)
             messages.success(request, "El préstamo quedó registrado.")
             return redirect(destino)
     return render(request, "prestamos/formulario.html", {"form": formulario, "titulo": titulo})
@@ -96,11 +99,12 @@ def devolver(request, prestamo_id):
     formulario = DevolucionForm(datos)
     if request.method == "POST" and formulario.is_valid():
         try:
-            registrar_devolucion(prestamo, **formulario.cleaned_data)
+            with transaction.atomic():
+                registrar_devolucion(prestamo, **formulario.cleaned_data)
+                auditar_operacion(request, "devolucion_registrada", "prestamo", prestamo.pk)
         except ValidationError as error:
             formulario.add_error(None, error)
         else:
-            registrar_evento(request, "devolucion", prestamo_id=prestamo.pk)
             messages.success(request, "La devolución quedó registrada.")
             return redirect("prestamos:activos")
     return render(request, "prestamos/formulario.html", {

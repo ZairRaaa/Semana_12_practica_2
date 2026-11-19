@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
@@ -25,8 +26,9 @@ EQUIPOS = (
 
 
 def crear_usuario(nombre, grupo, nombres, apellidos):
+    correo = f"{nombre}@{settings.CASO.dominio}"
     usuario, creado = get_user_model()._default_manager.get_or_create(
-        username=nombre,
+        username=correo,
         defaults={
             "first_name": nombres,
             "last_name": apellidos,
@@ -50,12 +52,12 @@ class Command(BaseCommand):
             nombre: Group.objects.get_or_create(name=nombre)[0]
             for nombre in (ADMINISTRADORES, ASISTENTES, DOCENTES)
         }
-        crear_usuario("demo_lab_admin", grupos[ADMINISTRADORES], "Marta", "Campos")
-        crear_usuario("demo_lab_asistente", grupos[ASISTENTES], "Luis", "Vega")
+        crear_usuario("demo-lab-admin", grupos[ADMINISTRADORES], "Marta", "Campos")
+        crear_usuario("demo-lab-asistente", grupos[ASISTENTES], "Luis", "Vega")
         docentes = [
-            crear_usuario("demo_lab_ana", grupos[DOCENTES], "Ana", "Quispe"),
-            crear_usuario("demo_lab_jorge", grupos[DOCENTES], "Jorge", "Salas"),
-            crear_usuario("demo_lab_elena", grupos[DOCENTES], "Elena", "Paredes"),
+            crear_usuario("demo-lab-ana", grupos[DOCENTES], "Ana", "Quispe"),
+            crear_usuario("demo-lab-jorge", grupos[DOCENTES], "Jorge", "Salas"),
+            crear_usuario("demo-lab-elena", grupos[DOCENTES], "Elena", "Paredes"),
         ]
 
         laboratorios = [

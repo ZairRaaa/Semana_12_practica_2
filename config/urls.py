@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
@@ -7,3 +8,6 @@ urlpatterns = [
     path("", TemplateView.as_view(template_name="inicio.html"), name="inicio"),
     path("admin/", admin.site.urls),
 ]
+
+if settings.CASO_ACTIVO == "laboratorio":
+    urlpatterns.append(path("prestamos/", include("prestamos.urls")))

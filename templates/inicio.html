@@ -9,7 +9,7 @@
     {% else %}
     <a class="boton inverso" href="{% url 'ingreso' %}">Iniciar sesión <span aria-hidden="true">→</span></a>
     {% endif %}
-    {% url 'catalogo' as catalogo %}
+    {% url 'prestamos:catalogo' as catalogo %}
     {% if catalogo %}<a class="boton secundario" href="{{ catalogo }}">Ver catálogo</a>{% endif %}
   </div>
 </section>

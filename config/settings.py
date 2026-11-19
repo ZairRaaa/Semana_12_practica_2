@@ -93,3 +93,25 @@ LOGGING = {
     "handlers": {"consola": {"class": "logging.StreamHandler"}},
     "loggers": {"cuentas.auditoria": {"handlers": ["consola"], "level": "INFO", "propagate": False}},
 }
+
+if CASO_ACTIVO == "laboratorio":
+    INSTALLED_APPS.append("prestamos")
+    PERMISOS_GRUPOS = {
+        "admin": (
+            "prestamos.laboratorio.view_laboratorio", "prestamos.laboratorio.add_laboratorio",
+            "prestamos.laboratorio.change_laboratorio", "prestamos.laboratorio.delete_laboratorio",
+            "prestamos.equipo.view_equipo", "prestamos.equipo.add_equipo",
+            "prestamos.equipo.change_equipo", "prestamos.equipo.delete_equipo",
+            "prestamos.prestamo.view_prestamo", "prestamos.prestamo.enviar_recordatorios",
+        ),
+        "docente": (
+            "prestamos.prestamo.solicitar_prestamo", "prestamos.prestamo.ver_historial_propio",
+        ),
+        "asistente": (
+            "prestamos.prestamo.registrar_prestamo", "prestamos.prestamo.registrar_devolucion",
+        ),
+    }
+    AVISOS_INGRESO = os.getenv("DJANGO_AVISOS_INGRESO", "prestamos.avisos.avisos_ingreso")
+
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

@@ -1,10 +1,12 @@
 from django import forms
 from django.contrib import admin, messages
 from django.core.mail import send_mass_mail
+from django.db import transaction
 from django.utils import timezone
 from django.utils.html import format_html
 
-from .eventos import registrar_evento
+from cuentas.auditoria import auditar_operacion
+
 from .models import Equipo, Laboratorio, Prestamo
 from .servicios import bloquear_equipo
 
@@ -63,16 +65,18 @@ class EquipoAdmin(admin.ModelAdmin):
         )
         self.message_user(request, f"Equipos marcados en mantenimiento: {cantidad}.")
 
+    @transaction.atomic
     def delete_model(self, request, obj):
         equipo_id = obj.pk
         super().delete_model(request, obj)
-        registrar_evento(request, "eliminacion", equipo_id=equipo_id)
+        auditar_operacion(request, "equipo_eliminado", "equipo", equipo_id)
 
+    @transaction.atomic
     def delete_queryset(self, request, queryset):
         equipos_ids = list(queryset.values_list("pk", flat=True))
         super().delete_queryset(request, queryset)
         for equipo_id in equipos_ids:
-            registrar_evento(request, "eliminacion", equipo_id=equipo_id)
+            auditar_operacion(request, "equipo_eliminado", "equipo", equipo_id)
 
 
 class FiltroEstadoPrestamo(admin.SimpleListFilter):

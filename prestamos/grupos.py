@@ -1,3 +1,3 @@
-ADMINISTRADORES = "Administradores"
-DOCENTES = "Docentes"
-ASISTENTES = "Asistentes"
+ADMINISTRADORES = "Administrador"
+DOCENTES = "Docente"
+ASISTENTES = "Asistente"
