@@ -24,3 +24,9 @@ Ejecutar `python manage.py cargar_prestamos_demo`. El comando puede repetirse so
 - Docentes: `demo_lab_ana`, `demo_lab_jorge` y `demo_lab_elena`
 
 Como ejemplo de validación en pantalla, solicitar cuatro unidades de un equipo operativo de demostración. Para un préstamo válido, elegir un equipo con unidades disponibles y una fecha de devolución posterior.
+
+## Evidencias del caso 1
+
+- [Solicitud inválida](../evidencias/rojas/01-solicitud-invalida.png). El formulario rechaza cuatro unidades cuando solo hay tres disponibles.
+- [Solicitud válida](../evidencias/rojas/02-solicitud-valida.png). Al corregir la cantidad, el préstamo queda registrado y aparece en el historial del docente.
+- [Django Admin](../evidencias/rojas/03-admin-filtro-y-accion.png). El filtro muestra los préstamos vencidos, los días de retraso y la acción para enviar un recordatorio.
