@@ -64,3 +64,32 @@ SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = not DEBUG
+
+# Cada caso se ejecuta con sus propios grupos, sesiones y base de datos.
+from cuentas.casos import CASOS
+
+CASO_ACTIVO = os.getenv("DJANGO_CASO", "laboratorio")
+CASO = CASOS[CASO_ACTIVO]
+DATABASES["default"]["NAME"] = BASE_DIR / f"{CASO_ACTIVO}.sqlite3"
+INSTALLED_APPS += ["cuentas"]
+MIDDLEWARE += [
+    "cuentas.middleware.AuditoriaMiddleware",
+    "cuentas.middleware.SesionMiddleware",
+    "cuentas.middleware.AvisosIngresoMiddleware",
+    "cuentas.middleware.HorarioMiddleware",
+]
+TEMPLATES[0]["OPTIONS"]["context_processors"].append("cuentas.views.contexto_caso")
+
+LOGIN_URL = "ingreso"
+LOGIN_REDIRECT_URL = "panel"
+LOGOUT_REDIRECT_URL = "inicio"
+SESSION_COOKIE_NAME = f"{CASO_ACTIVO}_sesion"
+SESSION_COOKIE_AGE = CASO.minutos * 60
+AVISOS_INGRESO = os.getenv("DJANGO_AVISOS_INGRESO", "")
+PERMISOS_GRUPOS = {}
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"consola": {"class": "logging.StreamHandler"}},
+    "loggers": {"cuentas.auditoria": {"handlers": ["consola"], "level": "INFO", "propagate": False}},
+}
